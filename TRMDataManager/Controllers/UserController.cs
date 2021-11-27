@@ -18,7 +18,7 @@ namespace TRMDataManager.Controllers
             string userId = RequestContext.Principal.Identity.GetUserId();
             UserData data = new UserData();
 
-            return data.GetUserById(userId).First();
+            return data.GetUserById(userId);
         }
     }
 }
