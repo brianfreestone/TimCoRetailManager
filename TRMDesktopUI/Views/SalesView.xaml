@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:TRMDesktopUI.Views"
-             mc:Ignorable="d" Background="White" FontSize="24"
+             mc:Ignorable="d" Background="White" FontSize="20"
              d:DesignHeight="550" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -33,10 +33,25 @@
         <ListBox x:Name="Products" Grid.Row="2" 
                   MinHeight="200" MinWidth="150" SelectedItem="{Binding SelectedProduct }">
             <ListBox.ItemTemplate>
-
                 <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding ProductName}"></TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Price: " FontSize="14"></TextBlock>
 
-                    <TextBlock Text="{Binding ProductName}"></TextBlock>
+                                <TextBlock Text="{Binding RetailPrice, StringFormat='{}{0:C}'}"  FontSize="14"></TextBlock>
+
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                                <TextBlock Text="Quantity: "  FontSize="14"></TextBlock>
+
+                                <TextBlock Text="{Binding QuantityInStock}"  FontSize="14"></TextBlock>
+
+                            </StackPanel>
+
+                        </StackPanel>
+                    </StackPanel>
                 </DataTemplate>
 
             </ListBox.ItemTemplate>
