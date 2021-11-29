@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TRMDataManager.Library.Internal.DataAccess;
-using TRMDataManagerLibrary.Models;
+using TRMDataManager.Library.Models;
 
 namespace TRMDataManager.Library.DataAccess
 {

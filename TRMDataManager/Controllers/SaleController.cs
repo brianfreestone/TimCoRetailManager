@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using TRMDataManager.Library.DataAccess;
 using TRMDataManager.Library.Models;
@@ -10,15 +11,15 @@ using TRMDataManager.Library.Models;
 namespace TRMDataManager.Controllers
 {
     [Authorize]
-    public class UserController : ApiController
+    public class SaleController : ApiController
     {
-        [HttpGet]
-        public UserModel GetById()
+        public void Post(SaleModel sale)
         {
+            SaleData data = new SaleData();
             string userId = RequestContext.Principal.Identity.GetUserId();
-            UserData data = new UserData();
 
-            return data.GetUserById(userId);
+            data.SaveSale(sale, userId);
         }
+
     }
 }
