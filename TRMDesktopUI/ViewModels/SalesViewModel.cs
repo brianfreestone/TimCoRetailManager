@@ -20,7 +20,8 @@ namespace TRMDesktopUI.ViewModels
         IConfigHelper _configHelper;
         IMapper _mapper;
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, ISaleEndpoint saleEndpoint, IMapper mapper)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper, 
+                              ISaleEndpoint saleEndpoint, IMapper mapper)
         {
             _productEndpoint = productEndpoint;
             _saleEndpoint = saleEndpoint;
@@ -69,6 +70,19 @@ namespace TRMDesktopUI.ViewModels
                 NotifyOfPropertyChange(() => SelectedProduct);
                 NotifyOfPropertyChange(() => CanAddToCart);
             }
+        }
+
+        private async Task ResetSalesViewModel()
+        {
+            Cart = new BindingList<CartItemDisplayModel>();
+            // TODO - add clearing the selectedCartItem
+
+            await LoadProducts();
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckout);
         }
 
         private CartItemDisplayModel _selectedCartItem;
@@ -215,6 +229,7 @@ namespace TRMDesktopUI.ViewModels
 
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
+
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
@@ -230,7 +245,7 @@ namespace TRMDesktopUI.ViewModels
 
                 // make sure something is selected
 
-                if (SelectedCartItem != null && SelectedCartItem.Product.QuantityInStock > 0)
+                if (SelectedCartItem != null && SelectedCartItem.QuantityInCart >= 0)
                 {
                     output = true;
                 }
@@ -256,6 +271,7 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => CanCheckout);
+            NotifyOfPropertyChange(() => CanAddToCart);
 
         }
 
@@ -290,6 +306,8 @@ namespace TRMDesktopUI.ViewModels
             }
 
             await _saleEndpoint.PostSale(sale);
+
+            await ResetSalesViewModel();
         }
 
     }
