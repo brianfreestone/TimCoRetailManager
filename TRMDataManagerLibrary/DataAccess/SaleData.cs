@@ -79,7 +79,7 @@ namespace TRMDataManager.Library.DataAccess
                     }
 
                     // finish the sale detail models
-                    // sql.CommitTransaction();
+                     sql.CommitTransaction();
                 }
                 catch 
                 {
