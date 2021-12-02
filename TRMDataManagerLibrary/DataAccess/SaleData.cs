@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TRMDataManager.Library.Internal.DataAccess;
 using TRMDataManager.Library.Models;
 using TRMDataManagerLibrary;
+using TRMDataManagerLibrary.Models;
 
 namespace TRMDataManager.Library.DataAccess
 {
@@ -79,9 +80,9 @@ namespace TRMDataManager.Library.DataAccess
                     }
 
                     // finish the sale detail models
-                     sql.CommitTransaction();
+                    sql.CommitTransaction();
                 }
-                catch 
+                catch
                 {
                     sql.RollbackTransaction();
                     throw;
@@ -89,6 +90,13 @@ namespace TRMDataManager.Library.DataAccess
             }
         }
 
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SqlDataAccess sql = new SqlDataAccess();
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "TRMData");
+        
+            return output;
+        }
 
     }
 }
