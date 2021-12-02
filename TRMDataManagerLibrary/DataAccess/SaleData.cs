@@ -19,7 +19,7 @@ namespace TRMDataManager.Library.DataAccess
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
             ProductData products = new ProductData();
 
-            decimal taxRate = ConfigHelper.GetTaxRate()/100;
+            decimal taxRate = ConfigHelper.GetTaxRate() / 100;
 
             foreach (var item in saleInfo.SaleDetails)
             {
@@ -57,22 +57,36 @@ namespace TRMDataManager.Library.DataAccess
             sale.Total = sale.SubTotal + sale.Tax;
 
             // save the sale model
-            SqlDataAccess sql = new SqlDataAccess();
-            sql.SaveData("dbo.spSale_Insert", sale, "TRMData");
 
-            // get the id from the sale model
-            sale.Id = sql.LoadData<int, dynamic>("spSale_Lookup", new {CashierId = sale.CashierId, SaleDate = sale.SaleDate }, "TRMData").FirstOrDefault();
-
-            foreach (var item in details)
+            using (SqlDataAccess sql = new SqlDataAccess())
             {
-                item.SaleId = sale.Id;
 
-                // save the sale detail models
-                sql.SaveData("dbo.spSaleDetail_Insert", item, "TRMData");
+                try
+                {
+                    sql.StartTransaction("TRMData");
+                    sql.SaveDataInTransaction("dbo.spSale_Insert", sale);
+
+                    // get the id from the sale model
+
+                    sale.Id = sql.LoadDataInTransaction<int, dynamic>("spSale_Lookup", new { CashierId = sale.CashierId, SaleDate = sale.SaleDate }).FirstOrDefault();
+
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+
+                        // save the sale detail models
+                        sql.SaveDataInTransaction("dbo.spSaleDetail_Insert", item);
+                    }
+
+                    // finish the sale detail models
+                    // sql.CommitTransaction();
+                }
+                catch 
+                {
+                    sql.RollbackTransaction();
+                    throw;
+                }
             }
-
-            // finish the sale detail models
-
         }
 
 

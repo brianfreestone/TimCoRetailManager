@@ -10,7 +10,7 @@ using Dapper;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {
-    internal class SqlDataAccess
+    internal class SqlDataAccess : IDisposable
     {
         public string GetConnectionString(string name)
         {
@@ -35,6 +35,56 @@ namespace TRMDataManager.Library.Internal.DataAccess
             {
                 con.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
+        }
+
+        private IDbConnection _connection;
+        private IDbTransaction _transaction;
+
+        public void StartTransaction(string conStringName)
+        {
+            //open connect/start transaction method
+            string connectionString = GetConnectionString(conStringName);
+
+            _connection = new SqlConnection(connectionString);
+            _connection.Open();
+
+            // load using the transaction
+            _transaction = _connection.BeginTransaction();
+
+
+            //
+        }
+
+        public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
+        {
+            _connection.Execute(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction);
+        }
+
+        public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
+        {
+
+            List<T> rows = _connection.Query<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
+
+            return rows;
+
+        }
+
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _connection?.Close();
+        }
+
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+            _connection?.Close();
+
+        }
+
+        public void Dispose()
+        {
+            CommitTransaction();
         }
     }
 }
