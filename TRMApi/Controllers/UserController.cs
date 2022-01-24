@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,17 +23,20 @@ namespace TRMApi.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IConfiguration _config;
 
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config)
         {
             this._context = context;
             this._userManager = userManager;
+            this._config = config;
         }
+
         [HttpGet]
         public UserModel GetById()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // RequestContext.Principal.Identity.GetUserId();
-            UserData data = new UserData();
+            UserData data = new UserData(_config);
 
             return data.GetUserById(userId);
         }
@@ -40,7 +44,7 @@ namespace TRMApi.Controllers
         //[AllowAnonymous]
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("api/User/Admin/GetAllUsers")]
+        [Route("Admin/GetAllUsers")]
         public List<ApplicationUserModel> GetAllUsers()
         {
             List<ApplicationUserModel> listUserModels = new List<ApplicationUserModel>();
@@ -68,7 +72,7 @@ namespace TRMApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
-        [Route("api/User/Admin/GetAllRoles")]
+        [Route("Admin/GetAllRoles")]
         public Dictionary<string, string> GetAllRoles()
         {
             var roles = _context.Roles.ToDictionary(x => x.Id, x => x.Name);
@@ -78,7 +82,7 @@ namespace TRMApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [Route("api/User/Admin/AddRole")]
+        [Route("Admin/AddRole")]
         public async Task AddARole(UserRolePairModel pair)
         {
 
@@ -89,7 +93,7 @@ namespace TRMApi.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        [Route("api/User/Admin/RemoveRole")]
+        [Route("Admin/RemoveRole")]
         public async Task RemoveARole(UserRolePairModel pair)
         {
             var user = await _userManager.FindByIdAsync(pair.UserId);
