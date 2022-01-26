@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Caliburn.Micro;
+using ServiceStack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
 using TRMDesktopUI.Models;
 using TRMDesktopUI.ViewModels;
+using SimpleContainer = Caliburn.Micro.SimpleContainer;
 
 namespace TRMDesktopUI
 {
