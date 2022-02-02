@@ -8,15 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {
-    internal class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
+        private readonly IConfiguration _config;
+        private readonly ILogger<SqlDataAccess> _logger;
 
-        public SqlDataAccess(IConfiguration config)
+        public SqlDataAccess(IConfiguration config, ILogger<SqlDataAccess> logger)
         {
             _config = config;
+            this._logger = logger;
         }
         public string GetConnectionString(string name)
         {
@@ -77,7 +81,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
         }
 
         private bool isClosed = false;
-        private readonly IConfiguration _config;
+
 
         public void CommitTransaction()
         {
@@ -103,15 +107,14 @@ namespace TRMDataManager.Library.Internal.DataAccess
                 {
                     CommitTransaction();
                 }
-                catch
-                { 
-
-                    // TODO log this issue
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Commit transaction failed in the dispose method.");
                 }
-            }
 
-            _transaction = null;
-            _connection = null;
+                _transaction = null;
+                _connection = null;
+            }
         }
     }
 }
